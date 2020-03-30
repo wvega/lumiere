@@ -18,3 +18,4 @@ modules:
       title: "%PLUGIN_NAME% Integration Tests"
       plugins: ['woocommerce/woocommerce.php', '%PLUGIN_DIR%/%PLUGIN_FILENAME%']
       activatePlugins: ['woocommerce/woocommerce.php', '%PLUGIN_DIR%/%PLUGIN_FILENAME%']
+      configFile: "wp-config.integration.php"

@@ -54,6 +54,9 @@ ADD docker-entrypoint.sh /usr/local/bin/
 
 RUN ["chmod", "+x", "/usr/local/bin/docker-entrypoint.sh"]
 
+ADD wp-config.integration.php /usr/local/src/
+ADD wp-config.acceptance.php /usr/local/src/
+
 WORKDIR /project
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]

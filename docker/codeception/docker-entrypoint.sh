@@ -16,11 +16,16 @@ wp_bootstrap() {
 
 	cd /wordpress
 
+	echo "Copying extra configuration files"
+
+	cp /usr/local/src/wp-config.integration.php /wordpress
+	cp /usr/local/src/wp-config.acceptance.php /project/tests/_support/_generated
+
 	echo "Making sure permissions are correct"
 
 	# make sure permissions are correct (maybe can be avoided with https://stackoverflow.com/a/56990338).
-	chown www-data:www-data /wordpress /wordpress/wp-content /wordpress/wp-content/plugins
-	chmod 755 /wordpress /wordpress /wordpress/wp-content /wordpress/wp-content/plugins
+	chown www-data:www-data /wordpress/wp-config.*.php /wordpress /wordpress/wp-content /wordpress/wp-content/plugins
+	chmod 755 /wordpress /wordpress/wp-config.*.php /wordpress /wordpress/wp-content /wordpress/wp-content/plugins
 
 	echo "Making sure the database server is up and running"
 
@@ -54,14 +59,7 @@ wp_bootstrap() {
 		wp core install --url=$WP_URL --title=tests --admin_user=$WP_ADMIN_USERNAME --admin_password=$WP_ADMIN_PASSWORD --admin_email=$WP_ADMIN_EMAIL
 
 		# overwrite existing configuration to make sure we are using the correct values
-		wp core config --dbhost=$DB_HOST --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --dbprefix=$TABLE_PREFIX --force --extra-php <<'PHP'
-// allows URLs to work while accessing the WordPress service from the host using mapped ports
-if ( 8443 === (int) $_SERVER['SERVER_PORT'] || 8080 === (int) $_SERVER['SERVER_PORT'] ) {
-	$protocol = 8443 === (int) $_SERVER['SERVER_PORT'] ? 'https' : 'http';
-	define( 'WP_HOME', "{$protocol}://{$_SERVER['HTTP_HOST']}" );
-	define( 'WP_SITEURL', "{$protocol}://{$_SERVER['HTTP_HOST']}" );
-}
-PHP
+		wp core config --dbhost=$DB_HOST --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --dbprefix=$TABLE_PREFIX --force --extra-php="require_once ABSPATH . 'wp-config.acceptance.php';"
 	fi
 
 	wp core update-db
